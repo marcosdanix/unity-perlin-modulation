@@ -7,18 +7,27 @@ class PlaneGenerator : IMeshGenerator
 {
     int horizontal, vertical;
 
-    Vector2 diagonal;
+    Vector3 lowerLeft;    
     Vector3 addPos;
+
+    Vector2 textureLowerLeft;
     Vector2 addUv;
 
-    public PlaneGenerator(Vector2 lowerLeft, Vector2 upperRight, int horizontal, int vertical)
+    public PlaneGenerator(Vector2 lowerLeft, Vector2 upperRight, Vector2 textureOriginPos, Vector2 textureSize, int horizontal, int vertical)
     {
         this.horizontal = horizontal;
-        this.vertical = vertical;
+        this.vertical = vertical;     
 
-        this.diagonal = upperRight - lowerLeft;
+        this.lowerLeft = new Vector3(lowerLeft.x, lowerLeft.y, 0.0f);
+        var diagonal = upperRight - lowerLeft;
         this.addPos = new Vector3(diagonal.x / horizontal, diagonal.y / vertical, 0.0f);
-        this.addUv  = new Vector2(1.0f / horizontal, 1.0f / vertical);
+
+        var inverseTextureSize = new Vector2(1.0f / textureSize.x, 1.0f / textureSize.y);
+        var posToTextureTransform = Matrix4x4.TRS(-textureOriginPos, Quaternion.identity, inverseTextureSize);
+        var addUv3 = posToTextureTransform.MultiplyVector(addPos);
+        this.addUv = new Vector2(addUv3.x, addUv3.y);
+        var textureLowerLeft3 = posToTextureTransform.MultiplyPoint3x4(lowerLeft);
+        this.textureLowerLeft = new Vector2(textureLowerLeft3.x, textureLowerLeft3.y);
     }
 
 
@@ -55,6 +64,7 @@ class PlaneGenerator : IMeshGenerator
     {
 
         Vector3 position = new Vector3(addPos.x * x, addPos.y * y, 0.0f);
+        position += lowerLeft;
         Vector3 nextX = position + addPos.x * Vector3.right;
         Vector3 nextY = position + addPos.y * Vector3.up;
         Vector3 nextXY = position + addPos;
@@ -74,6 +84,7 @@ class PlaneGenerator : IMeshGenerator
     private void GenerateUv(MeshAttributes mesh, int x, int y, int index)
     {
         Vector2 texCoord = new Vector2(addUv.x * x, addUv.y * y);
+        texCoord += textureLowerLeft;
         Vector2 nextU = texCoord + addUv.x * Vector2.right;
         Vector2 nextV = texCoord + addUv.y * Vector2.up;
         Vector2 nextUV = texCoord + addUv;
@@ -89,4 +100,5 @@ class PlaneGenerator : IMeshGenerator
         mesh.uv[index + 5] = nextV;
     }
 }
+
 
