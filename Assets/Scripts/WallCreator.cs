@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour {
+public class WallCreator : MonoBehaviour {
+
+    public Vector2 LowerLeft;
+    public Vector2 UpperRight;
+    public PerlinModulationSettings settings;
+
 
 	// Use this for initialization
 	void Start () {

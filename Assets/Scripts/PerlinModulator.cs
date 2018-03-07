@@ -13,6 +13,7 @@ class PerlinModulator : IModulator
     public Vector3 seed { get; set; }
     public Vector3 seedX { get; set; }
     public Vector3 seedY { get; set; }
+
     public Vector2 uvDistPos { get; set; } //The distance between vertices in the U (left-right) and V (up-down) direction
     public Vector2 uvDistTex { get; set; } //The distance between vertices in the U (left-right) and V (up-down) direction
     public Vector2 uvDisplacement { get; set; } //Displacement multiplier in the UV plane
