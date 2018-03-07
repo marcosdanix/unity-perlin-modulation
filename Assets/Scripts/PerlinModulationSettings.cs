@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 
-[System.Serializable]
+[CreateAssetMenu(fileName = "Perlin Modulation Settings", menuName = "Perlin Modulation/Settings")]
 public class PerlinModulationSettings : ScriptableObject {
     public float Frequency = 1.0f;
     public float Amplitude = 1.0f;
