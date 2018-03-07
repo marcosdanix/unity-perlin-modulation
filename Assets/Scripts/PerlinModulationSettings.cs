@@ -3,15 +3,15 @@
 
 [CreateAssetMenu(fileName = "Perlin Modulation Settings", menuName = "Perlin Modulation/Settings")]
 public class PerlinModulationSettings : ScriptableObject {
-    public float Frequency = 1.0f;
-    public float Amplitude = 1.0f;
-    public int Octaves = 4;
-    public Vector3 Seed = Vector3.zero;
-    public Vector3 SeedX = Vector3.zero;
-    public Vector3 SeedY = Vector3.zero;
+    public float frequency = 1.0f;
+    public float amplitude = 1.0f;
+    public int octaves = 4;
+    public Vector3 seed = Vector3.zero;
+    public Vector3 seedX = Vector3.zero;
+    public Vector3 seedY = Vector3.zero;
 
-    public int ResolutionPerUnitX = 1;
-    public int ResolutionPerUnitY = 1;
+    public int resolutionPerUnitX = 1;
+    public int resolutionPerUnitY = 1;
     public float horizontalAmplitudeMultiplier = 1.0f;
     public float verticalAmplitudeMultiplier = 1.0f;
 }
