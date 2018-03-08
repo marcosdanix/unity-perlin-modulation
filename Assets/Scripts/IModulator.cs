@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 
-
-interface IModulator
+namespace Marcosdanix.PerlinModulation
 {
-    Mesh Modulate(MeshAttributes mesh);    
+    interface IModulator
+    {
+        Mesh Modulate(MeshAttributes mesh);
+    }
 }
 

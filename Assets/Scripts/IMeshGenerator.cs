@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 
-interface IMeshGenerator
+namespace Marcosdanix.PerlinModulation
 {
-    MeshAttributes Generate();
+    interface IMeshGenerator
+    {
+        MeshAttributes Generate();
+    }
 }
-

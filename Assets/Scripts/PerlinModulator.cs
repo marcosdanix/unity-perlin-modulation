@@ -4,87 +4,90 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-class PerlinModulator : IModulator
+namespace Marcosdanix.PerlinModulation
 {
-    public float frequency { get; set; }
-    public float amplitude { get; set; }
-    public int octaves { get; set; }
-    public Matrix4x4 world { get; set; }
-    public Vector3 seed { get; set; }
-    public Vector3 seedX { get; set; }
-    public Vector3 seedY { get; set; }
-
-    public Vector2 uvDistPos { get; set; } //The distance between vertices in the U (left-right) and V (up-down) direction
-    public Vector2 uvDistTex { get; set; } //The distance between vertices in the U (left-right) and V (up-down) direction
-    public Vector2 uvDisplacement { get; set; } //Displacement multiplier in the UV plane
-    public float vMin; //smallest v position
-    public float vMax; //largest v position
-
-    private Vector3 uvwAmplitudePos;
-    private Vector2 uvAmplitudeTex;
-
-
-    public Mesh Modulate(MeshAttributes mesh)
+    class PerlinModulator : IModulator
     {
-        Mesh result = new Mesh();
-        int length = mesh.vertices.Length;
+        public float frequency { get; set; }
+        public float amplitude { get; set; }
+        public int octaves { get; set; }
+        public Matrix4x4 world { get; set; }
+        public Vector3 seed { get; set; }
+        public Vector3 seedX { get; set; }
+        public Vector3 seedY { get; set; }
 
-        uvwAmplitudePos = new Vector3(
-            uvDisplacement.x * uvDistPos.x,
-            uvDisplacement.y * uvDistPos.y, 
-            amplitude
-        );
+        public Vector2 uvDistPos { get; set; } //The distance between vertices in the U (left-right) and V (up-down) direction
+        public Vector2 uvDistTex { get; set; } //The distance between vertices in the U (left-right) and V (up-down) direction
+        public Vector2 uvDisplacement { get; set; } //Displacement multiplier in the UV plane
+        public float vMin; //smallest v position
+        public float vMax; //largest v position
 
-        uvAmplitudeTex = Vector2.Scale(uvDistTex, uvDisplacement);
+        private Vector3 uvwAmplitudePos;
+        private Vector2 uvAmplitudeTex;
 
-        for (int i=0; i<length; ++i)
+
+        public Mesh Modulate(MeshAttributes mesh)
         {
-            Vector3 normal = mesh.normals[mesh.normalIndex[i]];
-            //AGAIN, TANGENT IS UP BECAUSE THIS ARE LEFT HANDED COORDINATES!!
-            Vector3 tangent = mesh.tangent[mesh.tangentIndex[i]];
-            Vector3 bitangent = Vector3.Cross(normal, tangent);
+            Mesh result = new Mesh();
+            int length = mesh.vertices.Length;
 
-            Vector3 noise = CalculateNoise(mesh.vertices[i]);
+            uvwAmplitudePos = new Vector3(
+                uvDisplacement.x * uvDistPos.x,
+                uvDisplacement.y * uvDistPos.y,
+                amplitude
+            );
 
-            float t = (mesh.vertices[i].y - vMin) / (vMax - vMin);
-            float vFactor = Mathf.Sin(Mathf.PI*t);
-            mesh.vertices[i] = ModulateVertex(mesh.vertices[i], noise, normal, bitangent, tangent, vFactor);
-            mesh.uv[i] = ModulateUv(mesh.uv[i], noise, vFactor);
+            uvAmplitudeTex = Vector2.Scale(uvDistTex, uvDisplacement);
+
+            for (int i = 0; i < length; ++i)
+            {
+                Vector3 normal = mesh.normals[mesh.normalIndex[i]];
+                //AGAIN, TANGENT IS UP BECAUSE THIS ARE LEFT HANDED COORDINATES!!
+                Vector3 tangent = mesh.tangent[mesh.tangentIndex[i]];
+                Vector3 bitangent = Vector3.Cross(normal, tangent);
+
+                Vector3 noise = CalculateNoise(mesh.vertices[i]);
+
+                float t = (mesh.vertices[i].y - vMin) / (vMax - vMin);
+                float vFactor = Mathf.Sin(Mathf.PI * t);
+                mesh.vertices[i] = ModulateVertex(mesh.vertices[i], noise, normal, bitangent, tangent, vFactor);
+                mesh.uv[i] = ModulateUv(mesh.uv[i], noise, vFactor);
+            }
+
+            result.vertices = mesh.vertices;
+            result.uv = mesh.uv;
+            result.triangles = mesh.triangles;
+
+            result.RecalculateNormals();
+            result.RecalculateTangents();
+            result.RecalculateBounds();
+
+            return result;
         }
 
-        result.vertices = mesh.vertices;
-        result.uv = mesh.uv;
-        result.triangles = mesh.triangles;
+        private Vector3 CalculateNoise(Vector3 position)
+        {
+            Vector3 noisePosition = (frequency * world.MultiplyPoint(position)) + seed;
+            return new Vector3(
+                    Perlin.Fbm(noisePosition + seedX, octaves),
+                    Perlin.Fbm(noisePosition + seedY, octaves),
+                    Perlin.Fbm(noisePosition, octaves)
+            );
+        }
 
-        result.RecalculateNormals();
-        result.RecalculateTangents();
-        result.RecalculateBounds();
+        private Vector3 ModulateVertex(
+            Vector3 position, Vector3 noise, Vector3 normal, Vector3 bitangent, Vector3 tangent, float vFactor)
+        {
+            Vector3 modulation = Vector3.Scale(noise, uvwAmplitudePos);
+            modulation[1] *= vFactor;
+            return position + modulation.x * bitangent + modulation.y * tangent + modulation.z * normal;
+        }
 
-        return result;
-    }
-
-    private Vector3 CalculateNoise(Vector3 position)
-    {
-        Vector3 noisePosition = (frequency * world.MultiplyPoint(position)) + seed;
-        return new Vector3(
-                Perlin.Fbm(noisePosition + seedX, octaves),
-                Perlin.Fbm(noisePosition + seedY, octaves),
-                Perlin.Fbm(noisePosition, octaves)
-        );
-    }
-
-    private Vector3 ModulateVertex(
-        Vector3 position, Vector3 noise, Vector3 normal, Vector3 bitangent, Vector3 tangent, float vFactor)
-    {
-        Vector3 modulation = Vector3.Scale(noise, uvwAmplitudePos);
-        modulation[1] *= vFactor;
-        return position + modulation.x * bitangent + modulation.y * tangent + modulation.z * normal;
-    }
-
-    private Vector2 ModulateUv(Vector2 texcoord, Vector3 noise, float vFactor)
-    {
-        Vector2 modulation = Vector2.Scale(noise, uvAmplitudeTex);
-        modulation[1] *= vFactor;
-        return texcoord + modulation;
+        private Vector2 ModulateUv(Vector2 texcoord, Vector3 noise, float vFactor)
+        {
+            Vector2 modulation = Vector2.Scale(noise, uvAmplitudeTex);
+            modulation[1] *= vFactor;
+            return texcoord + modulation;
+        }
     }
 }
