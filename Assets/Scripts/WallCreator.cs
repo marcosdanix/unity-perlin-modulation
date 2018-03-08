@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Marcosdanix.PerlinModulation
 {
-    public class WallCreator : MonoBehaviour
+    [ExecuteInEditMode]
+    public class WallCreator : MonoBehaviour, ICreator
     {
 
         public Vector2Int LowerLeft;
@@ -13,9 +14,7 @@ namespace Marcosdanix.PerlinModulation
         public Vector2 TexCoordSize;
         public PerlinModulationSettings settings;
 
-
-        // Use this for initialization
-        void Start()
+        public void Create()
         {
             int resX = settings.resolutionPerUnitX * (UpperRight.x - LowerLeft.x);
             int resY = settings.resolutionPerUnitY * (UpperRight.y - LowerLeft.y);
