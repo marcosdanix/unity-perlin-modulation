@@ -23,11 +23,9 @@ class PlaneGenerator : IMeshGenerator
         this.addPos = new Vector3(diagonal.x / horizontal, diagonal.y / vertical, 0.0f);
 
         var inverseTextureSize = new Vector2(1.0f / textureSize.x, 1.0f / textureSize.y);
-        var posToTextureTransform = Matrix4x4.TRS(-textureOriginPos, Quaternion.identity, inverseTextureSize);
-        var addUv3 = posToTextureTransform.MultiplyVector(addPos);
-        this.addUv = new Vector2(addUv3.x, addUv3.y);
-        var textureLowerLeft3 = posToTextureTransform.MultiplyPoint3x4(lowerLeft);
-        this.textureLowerLeft = new Vector2(textureLowerLeft3.x, textureLowerLeft3.y);
+        var posToTextureTransform = Matrix4x4.Scale(inverseTextureSize) * Matrix4x4.Translate(-textureOriginPos);
+        this.addUv = posToTextureTransform.MultiplyVector(addPos);
+        this.textureLowerLeft = posToTextureTransform.MultiplyPoint3x4(lowerLeft);
     }
 
 
