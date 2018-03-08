@@ -11,13 +11,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf577f998c109ff4c96f04d84acfecfa, type: 3}
   m_Name: Perlin Modulation Settings
   m_EditorClassIdentifier: 
-  Frequency: 1
-  Amplitude: 1
-  Octaves: 4
-  Seed: {x: 0, y: 0, z: 0}
-  SeedX: {x: 0, y: 0, z: 0}
-  SeedY: {x: 0, y: 0, z: 0}
-  ResolutionPerUnitX: 1
-  ResolutionPerUnitY: 1
-  horizontalAmplitudeMultiplier: 1
-  verticalAmplitudeMultiplier: 1
+  frequency: 0.66
+  amplitude: 1
+  octaves: 3
+  seed: {x: 0, y: 0, z: 0}
+  seedX: {x: 0, y: 0, z: 0}
+  seedY: {x: 0, y: 0, z: 0}
+  resolutionPerUnitX: 3
+  resolutionPerUnitY: 3
+  horizontalAmplitudeMultiplier: 0.75
+  verticalAmplitudeMultiplier: 0.75
